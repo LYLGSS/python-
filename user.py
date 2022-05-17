@@ -6,23 +6,92 @@ import os
 class Person:
 
     # 类属性
-    Name = ["张三", "李四","1"]  # 存储姓名的列表
-    Password = ["L2015105000", "W2015105001","111qqq"]  # 存储学号的列表
+    # Name = ["张三", "李四","1"]  # 存储姓名的列表
+    # Password = ["L2015105000", "W2015105001","111qqq"]  # 存储学号的列表
+
+    Name = []  # 存储姓名的列表
+    Password = []  # 存储学号的列表
+
     Sensitive_Words = ["傻", "蠢", "笨", "呆", "愚"]  # 敏感词库
     Number_Bank = list(string.digits)  # 数字库
     Letter_Bank = list(string.ascii_letters)  # 字母库（含大写小写）
-    Book_Name = ["水浒传","西游记","离散数学","概率论"]       # 书的名字
-    Book_Number = [2,3,2,4]     # 书的剩余量
+
+    # Book_Name = ["水浒传","西游记","离散数学","概率论"]       # 书的名字
+    # Book_Number = [2,3,2,4]     # 书的剩余量
+
+    Book_Name = []       # 书的名字
+    Book_Number = []     # 书的剩余量
+
+    # 已注册用户的用户名
+    userName = []
+
+    # 已注册用户的密码
+    userPassword = []
 
     def __init__(self):
         self.name = None
         self.password = None
+
+    # 从userInfo.json中获取用户信息
+    def get_userInfo(self):
+
+        # 获取userInfo.json的路径
+        self.path = os.path.join(os.getcwd(), "data\\root")
+        self.userInfo_path = os.path.join(self.path, "userInfo.json")
+
+        # 从userInfo.json中读取所有的用户名
+        with open(self.userInfo_path, "r") as readName:
+            result = json.load(readName)
+            # 将读取出来的用户名和密码赋值给Person.Name 和 Person.Password
+            Person.Name = result["name"]
+            Person.Password = result["password"]
+
+    # 从bookInfo.json中获取书的信息
+    def get_bookInfo(self):
+        # 获取bookInfo.json的路径
+        self.path = os.path.join(os.getcwd(), "data\\root")
+        self.bookInfo_path = os.path.join(self.path, "bookInfo.json")
+
+        # 从bookInfo.json中读取所有书的信息
+        with open(self.bookInfo_path, "r") as readBook:
+            result = json.load(readBook)
+            # 将读取出来的用户名和密码赋值给Person.Name 和 Person.Password
+            Person.Book_Name = result["book_name"]
+            Person.Book_Number = result["book_number"]
+
+    # 更新bookInfo.json中书的信息
+    def update_bookInfo(self):
+        # 将书名和书的数量保存到root目录下的bookInfo.json中
+        self.data = {"book_name": Person.Book_Name, "book_number": Person.Book_Number}
+
+        # 获取bookInfo.json的路径
+        self.path = os.path.join(os.getcwd(), "data\\root")
+        self.bookInfo_path = os.path.join(self.path, "bookInfo.json")
+
+        with open(self.bookInfo_path, "w") as f:
+            json.dump(self.data, f)
+
+    # 更新userInfo.json中的用户信息
+    def update_userInfo(self):
+        # 将用户名和密码保存到root目录下的userInfo.json中
+        self.data = {"name": Person.Name, "password": Person.Password}
+
+        # 获取userInfo.json的路径
+        self.path = os.path.join(os.getcwd(), "data\\root")
+        self.userInfo_path = os.path.join(self.path, "userInfo.json")
+
+        with open(self.userInfo_path, "w") as f:
+            json.dump(self.data, f)
 
 class User(Person):
 
     def __init__(self):
         # 用户已借阅书籍
         self.book_name = []
+        # 将读取出来的书名和书的数量赋值给Person.Book_Name 和Person.Book_Number
+        self.get_bookInfo()
+        # 将读取出来的用户名和密码赋值给Person.Name 和 Person.Password
+        self.get_userInfo()
 
     def menu1(self):
         print("\n---欢迎来到图书馆借阅管理系统---")
@@ -44,6 +113,9 @@ class User(Person):
     # 注册
     def register(self):
         print("开始注册")
+
+        # print("Person.Name:",Person.Name)
+        # print("Person.Password",Person.Password)
 
         self.name = input("请输入你的姓名：")
         self.flag = 0  # 记录要注册的用户名是否已存在或存在敏感词
@@ -101,19 +173,7 @@ class User(Person):
                     Person.Name.append(self.name)
                     Person.Password.append(self.password)
 
-                    # 将密码保存到data.json文件中
-                    # data = {
-                    #     "name":Person.Name,
-                    #     "password":Person.Password
-                    # }
-
-                    # with open("D:\\Python\\pythonProject\\venv\\面向对象程序设计\\data.json","w") as f:
-                    #     json.dump(data,f)
-
-                    # with open("D:\\Python\\pythonProject\\venv\\面向对象程序设计\\data.json", "r") as f:
-                    #     result = json.load(f)
-                    #     print(result)
-                    #     print(result["name"][1])
+                    self.update_userInfo()
 
                     print("注册成功！\n")
                     print("Name:", Person.Name)
@@ -234,7 +294,7 @@ class User(Person):
         else:
             # 没有借阅过本书，开始借阅
             for i in Person.Book_Name:
-                if i == self.borrow_book_name:
+                if i == self.borrow_book_name and Person.Book_Number[Person.Book_Name.index(i)]:
                     # 有要借阅的书籍
                     self.flag += 1
                     # 获取要借阅书的索引
@@ -250,15 +310,21 @@ class User(Person):
                 # 从Book_Number中减少一本
                 Person.Book_Number[self.index] -= 1
 
-                # print("已借阅书：",self.book_name)
-                # print("剩余量：",Person.Book_Number[self.index])
-
+                self.update_bookInfo()
                 self.save_my_book()
                 self.menu1_book()
             else:
                 # 没有要借阅的书籍
                 print("没有要借阅的书籍")
-                print(f"你可以借阅如下几本书:\n{Person.Book_Name}")
+
+                # 查询书籍库中可借的书
+                tmp_Person_Book_Name = []
+                for i in Person.Book_Number:
+                    if not i == 0:
+                        tmp_index = Person.Book_Number.index(i)
+                        tmp_Person_Book_Name.append(Person.Book_Name[tmp_index])
+
+                print(f"你可以借阅如下几本书:\n{tmp_Person_Book_Name}")
                 self.borrow_book()
 
     # 归还书籍
@@ -312,6 +378,7 @@ class User(Person):
                     Person.Book_Name.append(self.repaid_book_name)
                     Person.Book_Number.append(1)
                     print(f"{self.repaid_book_name}归还成功!")
+                self.update_bookInfo()
                 self.save_my_book()
                 self.menu1_book()
 
@@ -370,6 +437,11 @@ class User(Person):
 
 
 class Root(Person):
+    def __init__(self):
+        # 将读取出来的用户名和密码赋值给Person.Name 和 Person.Password
+        self.get_userInfo()
+        # 将读取出来的书名和书的数量赋值给Person.Book_Name 和Person.Book_Number
+        self.get_bookInfo()
 
     def root_menu(self):
         print("\n--------欢迎来到图书馆借阅管理系统-------")
@@ -485,6 +557,7 @@ class Root(Person):
             else:
                 Person.Name.append(self.name)
                 Person.Password.append(self.password)
+                self.update_userInfo()
                 print("添加成功！\n")
                 # print("Name:", Person.Name)
                 # print("Password:", Person.Password)
@@ -520,6 +593,7 @@ class Root(Person):
             print("该用户不存在，请重新输入！")
             self.del_Info()
         else:
+            self.update_userInfo()
             print(f'{self.removed_name}的信息已删除')
             # print("Name:", Person.Name)
             # print("Password:", Person.Password)
@@ -574,6 +648,7 @@ class Root(Person):
                             if self.index1 == 0:
                                 # 修改用户名
                                 Person.Name[self.index] = self.new_name
+                                self.update_userInfo()
                                 print("用户名修改成功！")
                                 break
                             elif self.index1 == 1:
@@ -620,6 +695,7 @@ class Root(Person):
                             # 密码符合要求，修改密码
                             else:
                                 Person.Password[self.index] = self.new_password
+                                self.update_userInfo()
                                 print("密码修改成功！\n")
                                 break
 
@@ -693,7 +769,7 @@ class Root(Person):
                                 break
 
                         # ---------------------------------------
-
+                        self.update_userInfo()
                         print("用户名和密码修改成功！")
 
                         self.menu2()
@@ -775,6 +851,9 @@ class Root(Person):
             Person.Book_Name.append(self.book_name)
             self.book_number = eval(input("请输入该书的数量："))
             Person.Book_Number.append(self.book_number)
+
+            self.update_bookInfo()
+
             print("添加成功！")
             self.menu2_2()
 
@@ -800,6 +879,10 @@ class Root(Person):
             # 从书籍库中删除书
             Person.Book_Name.remove(self.book_name)
             Person.Book_Number.pop(self.index)
+
+            # 更新root目录下的bookInfo.json中书的信息
+            self.update_bookInfo()
+
             print(f"'{self.book_name}'删除成功！")
 
             self.menu2_2()
@@ -854,6 +937,7 @@ class Root(Person):
                             continue
                         else:
                             Person.Book_Name[self.index] = self.new_book_name
+                            self.update_bookInfo()
                             print("修改成功！")
                             break
                     break
@@ -868,6 +952,7 @@ class Root(Person):
                             continue
                         else:
                             Person.Book_Number[self.index] = self.new_book_number
+                            self.update_bookInfo()
                             print("修改成功！")
                             break
                     break
@@ -902,7 +987,7 @@ class Root(Person):
                         else:
                             Person.Book_Number[self.index] = self.new_book_number
                             break
-
+                    self.update_bookInfo()
                     print("修改成功！")
                     break
                 else:
