@@ -20,8 +20,22 @@
 # print("---         2.图书管理页             ---")
 # print("--------------------------------------\n")
 
-import os
-path = os.getcwd()
-fileName = "1" + ".json"
-dir = os.path.join(path,fileName)
-print(dir)
+# import os
+# path = os.getcwd()
+# fileName = "1" + ".json"
+# dir = os.path.join(path,fileName)
+# print(dir)
+
+# import os
+# path = os.getcwd()
+# fileName = "data\\" + "1" + "\\my_book.json"
+# dir = os.path.join(path,fileName)
+# print(dir)
+
+# import os
+# # 先查看data目录下有没有该用户的文件夹，没有则创建
+# path = os.path.join(os.getcwd(),"data")
+# my_dir = os.path.join(path,"郭开开")
+# if not os.path.exists(my_dir):
+#     os.makedirs(my_dir)
+

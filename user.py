@@ -327,33 +327,43 @@ class User(Person):
         self.menu1_book()
 
 
+    # 封装：获取存放当前用户信息的目录
+    def get_myDir(self):
+        self.path = os.path.join(os.getcwd(), "data\\user")
+        self.myDir = os.path.join(self.path, self.name)
+        return self.myDir
+
     # 保存借阅的书到当前登录用户名开头的json文件
     def save_my_book(self):
         self.my_book = {"my_book":self.book_name}
 
         # 获取json文件的绝对路径
-        self.path = os.getcwd()
-        self.fileName = self.name + ".json"
-        self.dir = os.path.join(self.path,self.fileName)
+        self.my_dir = self.get_myDir()
+        self.fileName = "my_book.json"
+        self.fileDir = os.path.join(self.my_dir, self.fileName)
 
-        with open(self.dir,"w") as save:
+        with open(self.fileDir,"w") as save:
             json.dump(self.my_book,save)
 
     # 从 .json文件 中读取已借阅书籍
     def read_my_book(self):
 
+        # 先查看data\user目录下有没有该用户的文件夹，没有则创建
+        self.my_dir = self.get_myDir()
+        if not os.path.exists(self.my_dir):
+            os.makedirs(self.my_dir)
+
         # 获取json文件的绝对路径
-        self.path = os.getcwd()
-        self.fileName = self.name + ".json"
-        self.dir = os.path.join(self.path, self.fileName)
+        self.fileName = "my_book.json"
+        self.fileDir = os.path.join(self.my_dir, self.fileName)
 
         # 没有该json文件则创建
-        if not(os.path.exists(self.fileName)):
+        if not(os.path.exists(self.fileDir)):
             self.empty_content = {"my_book":[]}
-            with open(self.fileName,"w") as found:
+            with open(self.fileDir,"w") as found:
                 json.dump(self.empty_content,found)
 
-        with open(self.fileName, "r") as read:
+        with open(self.fileDir, "r") as read:
             self.my_book = json.load(read)
             # print(self.my_book)
             return self.my_book["my_book"]
