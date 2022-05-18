@@ -235,8 +235,8 @@ class User(Person):
             # Name列表中有输入的姓名
             if self.flag == 1:
                 while self.flag_password_flase < 3:
-                    # self.password = maskpass.askpass(prompt='请输入你的密码：')
-                    self.password = input('请输入你的密码：')
+                    self.password = maskpass.askpass(prompt='请输入你的密码：')
+                    # self.password = input('请输入你的密码：')
 
                     if self.password == Person.Password[self.index]:
                         print("登录成功！")
