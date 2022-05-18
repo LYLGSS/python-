@@ -83,6 +83,35 @@ class Person:
         with open(self.userInfo_path, "w") as f:
             json.dump(self.data, f)
 
+    # 从 .json文件 中读取已借阅书籍
+    def read_my_book(self):
+
+        # 先查看data\user目录下有没有该用户的文件夹，没有则创建
+        self.my_dir = self.get_myDir()
+        if not os.path.exists(self.my_dir):
+            os.makedirs(self.my_dir)
+
+        # 获取json文件的绝对路径
+        self.fileName = "my_book.json"
+        self.fileDir = os.path.join(self.my_dir, self.fileName)
+
+        # 没有该json文件则创建
+        if not (os.path.exists(self.fileDir)):
+            self.empty_content = {"my_book": []}
+            with open(self.fileDir, "w") as found:
+                json.dump(self.empty_content, found)
+
+        with open(self.fileDir, "r") as read:
+            self.my_book = json.load(read)
+            # print(self.my_book)
+            return self.my_book["my_book"]
+
+    # 封装：获取存放当前用户信息的目录
+    def get_myDir(self):
+        self.path = os.path.join(os.getcwd(), "data\\user")
+        self.myDir = os.path.join(self.path, self.name)
+        return self.myDir
+
 class User(Person):
 
     def __init__(self):
@@ -204,8 +233,8 @@ class User(Person):
             # Name列表中有输入的姓名
             if self.flag == 1:
                 while self.flag_password_flase < 3:
-                    # self.password = maskpass.askpass(prompt='请输入你的密码：')
-                    self.password = input('请输入你的密码：')
+                    self.password = maskpass.askpass(prompt='请输入你的密码：')
+                    # self.password = input('请输入你的密码：')
 
                     if self.password == Person.Password[self.index]:
                         print("登录成功！")
@@ -361,8 +390,6 @@ class User(Person):
                             self.flag2 += 1
                             break
 
-                    # 获取要归还书在书籍库中的索引
-                    self.index = Person.Book_Name.index(i)
                     break
 
             if self.flag == 1:
@@ -371,6 +398,8 @@ class User(Person):
                 self.book_name.remove(self.repaid_book_name)
                 if self.flag2 == 1:
                     # 书籍库中有要归还的书，则书的个数+1
+                    # 获取要归还书在书籍库中的索引
+                    self.index = Person.Book_Name.index(self.repaid_book_name)
                     Person.Book_Number[self.index] += 1
                     print(f"{self.repaid_book_name}归还成功!")
                 else:
@@ -393,13 +422,6 @@ class User(Person):
         print(self.read_my_book())
         self.menu1_book()
 
-
-    # 封装：获取存放当前用户信息的目录
-    def get_myDir(self):
-        self.path = os.path.join(os.getcwd(), "data\\user")
-        self.myDir = os.path.join(self.path, self.name)
-        return self.myDir
-
     # 保存借阅的书到当前登录用户名开头的json文件
     def save_my_book(self):
         self.my_book = {"my_book":self.book_name}
@@ -411,29 +433,6 @@ class User(Person):
 
         with open(self.fileDir,"w") as save:
             json.dump(self.my_book,save)
-
-    # 从 .json文件 中读取已借阅书籍
-    def read_my_book(self):
-
-        # 先查看data\user目录下有没有该用户的文件夹，没有则创建
-        self.my_dir = self.get_myDir()
-        if not os.path.exists(self.my_dir):
-            os.makedirs(self.my_dir)
-
-        # 获取json文件的绝对路径
-        self.fileName = "my_book.json"
-        self.fileDir = os.path.join(self.my_dir, self.fileName)
-
-        # 没有该json文件则创建
-        if not(os.path.exists(self.fileDir)):
-            self.empty_content = {"my_book":[]}
-            with open(self.fileDir,"w") as found:
-                json.dump(self.empty_content,found)
-
-        with open(self.fileDir, "r") as read:
-            self.my_book = json.load(read)
-            # print(self.my_book)
-            return self.my_book["my_book"]
 
 
 class Root(Person):
@@ -511,6 +510,10 @@ class Root(Person):
             print("输入有误，请重新输入！")
             self.menu2_2()
 
+    def change_userDirName(self,new_name):
+        old_dirName = self.get_myDir()
+        new_dirName = os.path.join(os.path.join(os.getcwd(),"data\\user"),new_name)
+        os.renames(old_dirName,new_dirName)
 
     # 添加用户信息
     def add_Info(self):
@@ -585,16 +588,34 @@ class Root(Person):
                 self.flag += 1
                 self.index = Person.Name.index(i)
                 self.removed_name = i
-                Person.Name.remove(i)
-                Person.Password.pop(self.index)
                 break
 
         if self.flag == 0:
             print("该用户不存在，请重新输入！")
             self.del_Info()
         else:
+            # 删除用户之前判断该该用户是否借阅书籍，若借阅的有书，则无法删除
+            temp_my_book = self.read_my_book()
+            if len(temp_my_book) == 0:
+                # 没有未归还的书
+
+                # 删除user/下该用户的my_book.json
+                del_dir = os.path.join(self.get_myDir(),"my_book.json")
+                os.remove(del_dir)
+                # 删除user/下该用户的文件夹
+                if len(os.listdir(self.get_myDir())) == 0:
+                    os.rmdir(self.get_myDir())
+
+                # 删除该用户
+                Person.Name.remove(self.removed_name)
+                Person.Password.pop(self.index)
+            else:
+                # 有未归还的书籍
+                print(f"'{self.name}'用户尚有未归还的书籍，无法删除该用户的信息！")
+                self.menu2()
+
             self.update_userInfo()
-            print(f'{self.removed_name}的信息已删除')
+            print(f"'{self.removed_name}'的信息已删除")
             # print("Name:", Person.Name)
             # print("Password:", Person.Password)
             self.menu2()
@@ -649,6 +670,7 @@ class Root(Person):
                                 # 修改用户名
                                 Person.Name[self.index] = self.new_name
                                 self.update_userInfo()
+                                self.change_userDirName(self.new_name)
                                 print("用户名修改成功！")
                                 break
                             elif self.index1 == 1:
@@ -770,6 +792,7 @@ class Root(Person):
 
                         # ---------------------------------------
                         self.update_userInfo()
+                        self.change_userDirName(self.new_name)
                         print("用户名和密码修改成功！")
 
                         self.menu2()
