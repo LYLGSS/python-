@@ -6,18 +6,12 @@ import os
 class Person:
 
     # 类属性
-    # Name = ["张三", "李四","1"]  # 存储姓名的列表
-    # Password = ["L2015105000", "W2015105001","111qqq"]  # 存储学号的列表
-
-    Name = []  # 存储姓名的列表
-    Password = []  # 存储学号的列表
-
     Sensitive_Words = ["傻", "蠢", "笨", "呆", "愚"]  # 敏感词库
     Number_Bank = list(string.digits)  # 数字库
     Letter_Bank = list(string.ascii_letters)  # 字母库（含大写小写）
 
-    # Book_Name = ["水浒传","西游记","离散数学","概率论"]       # 书的名字
-    # Book_Number = [2,3,2,4]     # 书的剩余量
+    Name = []  # 存储姓名的列表
+    Password = []  # 存储学号的列表
 
     Book_Name = []       # 书的名字
     Book_Number = []     # 书的剩余量
@@ -139,6 +133,14 @@ class User(Person):
             print("输入有误,请重新输入")
             self.menu1()
 
+    # 查询书籍库中可借的书
+    def search_canBorrow(self):
+        tmp_Person_Book_Name = []
+        for j in range(0, len(Person.Book_Number)):
+            if not Person.Book_Number[j] == 0:
+                tmp_Person_Book_Name.append(Person.Book_Name[j])
+        return tmp_Person_Book_Name
+
     # 注册
     def register(self):
         print("开始注册")
@@ -233,8 +235,8 @@ class User(Person):
             # Name列表中有输入的姓名
             if self.flag == 1:
                 while self.flag_password_flase < 3:
-                    self.password = maskpass.askpass(prompt='请输入你的密码：')
-                    # self.password = input('请输入你的密码：')
+                    # self.password = maskpass.askpass(prompt='请输入你的密码：')
+                    self.password = input('请输入你的密码：')
 
                     if self.password == Person.Password[self.index]:
                         print("登录成功！")
@@ -309,6 +311,9 @@ class User(Person):
         # 标识是否已借阅过本书
         self.flag2 = 0
 
+        # 标识已借阅书籍和可借阅书籍相同的本数
+        self.flag3 = 0
+
         self.borrow_book_name = input("请输入要借阅的书名：")
 
         # 在借阅前查看是否已借阅过本书
@@ -318,6 +323,18 @@ class User(Person):
                 break
 
         if self.flag2 == 1:
+            # 借阅过本书，查看是否已经将书籍库中的书全部借完，借完的话，返回主页
+            # 查找可以借阅的书
+            self.canBorrow = self.search_canBorrow()
+            for x in self.book_name:
+                for y in self.canBorrow:
+                    if x == y:
+                        self.flag3 += 1
+
+            if self.flag3 == len(self.canBorrow):
+                print("\n书籍库中的书已经被你借完啦！")
+                self.menu1_book()
+
             print(f"你已经借阅过'{self.borrow_book_name}'了，不可再借阅本书，请重新输入！")
             self.borrow_book()
         else:
@@ -346,14 +363,10 @@ class User(Person):
                 # 没有要借阅的书籍
                 print("没有要借阅的书籍")
 
-                # 查询书籍库中可借的书
-                tmp_Person_Book_Name = []
-                for i in Person.Book_Number:
-                    if not i == 0:
-                        tmp_index = Person.Book_Number.index(i)
-                        tmp_Person_Book_Name.append(Person.Book_Name[tmp_index])
+                # 查找可以借阅的书
+                self.canBorrow = self.search_canBorrow()
 
-                print(f"你可以借阅如下几本书:\n{tmp_Person_Book_Name}")
+                print(f"你可以借阅如下几本书:\n{self.canBorrow}")
                 self.borrow_book()
 
     # 归还书籍
@@ -401,12 +414,12 @@ class User(Person):
                     # 获取要归还书在书籍库中的索引
                     self.index = Person.Book_Name.index(self.repaid_book_name)
                     Person.Book_Number[self.index] += 1
-                    print(f"{self.repaid_book_name}归还成功!")
+                    print(f"'{self.repaid_book_name}'归还成功!")
                 else:
                     # 书籍库中没有要归还的书，则向书籍库中添加书名，并且书籍的个数+1
                     Person.Book_Name.append(self.repaid_book_name)
                     Person.Book_Number.append(1)
-                    print(f"{self.repaid_book_name}归还成功!")
+                    print(f"'{self.repaid_book_name}'归还成功!")
                 self.update_bookInfo()
                 self.save_my_book()
                 self.menu1_book()
