@@ -911,36 +911,43 @@ class Root(Person):
         # 记录查询到的用户名
         self.sname = ""
 
-        self.a = eval(input("请输入查询的方式（1：单个用户  2：全部用户）："))
+        # 捕获输入非法字符的异常
+        try:
+            self.a = eval(input("请输入查询的方式（1：单个用户  2：全部用户）："))
+        except:
+            print(inputError.__str__(self))
+            self.show_Info()
 
-        if self.a == 1:
-            self.name = input("请输入要查询的用户名：")
-            for i in Person.Name:
-                if i == self.name:
-                    self.flag += 1
-                    self.index = Person.Name.index(i)
-                    self.sname = i
-                    break
+        # 捕获输入选项错误的异常
+        try:
+            if self.a == 1:
+                self.name = input("请输入要查询的用户名：")
+                for i in Person.Name:
+                    if i == self.name:
+                        self.flag += 1
+                        self.index = Person.Name.index(i)
+                        self.sname = i
+                        break
 
-            if self.flag == 1:
-                print("查找成功！")
-                print(f'name:{self.sname}\tpassword:{Person.Password[self.index]}')
+                if self.flag == 1:
+                    print("查找成功！")
+                    print(f'name:{self.sname}\tpassword:{Person.Password[self.index]}')
+                    self.menu2()
+                else:
+                    print("该用户信息不存在，请重新输入!")
+                    self.show_Info()
+
+            elif self.a == 2:
+                print("查找成功，全部用户信息如下：")
+                print("name\tpassword")
+                for i in range(len(Person.Name)):
+                    print(f'{Person.Name[i]}\t{Person.Password[i]}')
                 self.menu2()
+
             else:
-                print("该用户信息不存在，请重新输入!")
-                self.show_Info()
-
-
-
-        elif self.a == 2:
-            print("查找成功，全部用户信息如下：")
-            print("name\tpassword")
-            for i in range(len(Person.Name)):
-                print(f'{Person.Name[i]}\t{Person.Password[i]}')
-            self.menu2()
-
-        else:
-            print("输入有误，请重新输入！")
+                raise valueError
+        except valueError as vErr:
+            print(vErr)
             self.show_Info()
 
     # 添加书籍
@@ -1037,78 +1044,91 @@ class Root(Person):
 
         if self.flag == 1:
             while 1:
-                self.a = eval(input("请输入要修改的内容（1：书名  2：库存  3：书名和库存）："))
-                if self.a == 1:
-                    while 1:
-                        # 修改书名
-                        self.new_book_name = input("请输入新的书名：")
+                # 捕获输入非法字符的异常
+                try:
+                    self.a = eval(input("请输入要修改的内容（1：书名  2：库存  3：书名和库存）："))
+                except:
+                    print(inputError.__str__(self))
+                    continue
 
-                        # 判断新的书名是否已存在
-                        for j in Person.Book_Name:
-                            if j == self.new_book_name:
-                                self.flag2 += 1
+                # 捕获输入选项错误的异常
+                try:
+                    if self.a == 1:
+                        while 1:
+                            # 修改书名
+                            self.new_book_name = input("请输入新的书名：")
 
-                        if self.flag2 == 1:
-                            print("新的书名已存在，请重新输入！")
-                            self.flag2 = 0
-                            continue
-                        else:
-                            Person.Book_Name[self.index] = self.new_book_name
-                            self.update_bookInfo()
-                            print("修改成功！")
-                            break
-                    break
-                elif self.a == 2:
-                    while 1:
-                        # 修改库存
-                        self.new_book_number = eval(input("请输入新的库存："))
+                            # 判断新的书名是否已存在
+                            for j in Person.Book_Name:
+                                if j == self.new_book_name:
+                                    self.flag2 += 1
 
-                        # 判断新的库存和旧的库存是否相同
-                        if self.new_book_number == Person.Book_Number[self.index]:
-                            print("新的库存不可和旧的库存相同，请重新输入！")
-                            continue
-                        else:
-                            Person.Book_Number[self.index] = self.new_book_number
-                            self.update_bookInfo()
-                            print("修改成功！")
-                            break
-                    break
-                elif self.a == 3:
-                    # 修改书名和库存
+                            if self.flag2 == 1:
+                                print("新的书名已存在，请重新输入！")
+                                self.flag2 = 0
+                                continue
+                            else:
+                                Person.Book_Name[self.index] = self.new_book_name
+                                self.update_bookInfo()
+                                print("修改成功！")
+                                break
+                        break
 
-                    while 1:
-                        # 修改书名
-                        self.new_book_name = input("请输入新的书名：")
+                    elif self.a == 2:
+                        while 1:
+                            # 修改库存
+                            self.new_book_number = eval(input("请输入新的库存："))
 
-                        # 判断新的书名是否已存在
-                        for j in Person.Book_Name:
-                            if j == self.new_book_name:
-                                self.flag2 += 1
+                            # 判断新的库存和旧的库存是否相同
+                            if self.new_book_number == Person.Book_Number[self.index]:
+                                print("新的库存不可和旧的库存相同，请重新输入！")
+                                continue
+                            else:
+                                Person.Book_Number[self.index] = self.new_book_number
+                                self.update_bookInfo()
+                                print("修改成功！")
+                                break
+                        break
 
-                        if self.flag2 == 1:
-                            print("新的书名已存在，请重新输入！")
-                            self.flag2 = 0
-                            continue
-                        else:
-                            Person.Book_Name[self.index] = self.new_book_name
-                            break
+                    elif self.a == 3:
+                        # 修改书名和库存
 
-                    while 1:
-                        # 修改库存
-                        self.new_book_number = eval(input("请输入新的库存："))
+                        while 1:
+                            # 修改书名
+                            self.new_book_name = input("请输入新的书名：")
 
-                        # 判断新的库存和旧的库存是否相同
-                        if self.new_book_number == Person.Book_Number[self.index]:
-                            print("新的库存不可和旧的库存相同，请重新输入！")
-                            continue
-                        else:
-                            Person.Book_Number[self.index] = self.new_book_number
-                            break
-                    self.update_bookInfo()
-                    print("修改成功！")
-                    break
-                else:
-                    print("输入有误，请重新输入！")
+                            # 判断新的书名是否已存在
+                            for j in Person.Book_Name:
+                                if j == self.new_book_name:
+                                    self.flag2 += 1
+
+                            if self.flag2 == 1:
+                                print("新的书名已存在，请重新输入！")
+                                self.flag2 = 0
+                                continue
+                            else:
+                                Person.Book_Name[self.index] = self.new_book_name
+                                break
+
+                        while 1:
+                            # 修改库存
+                            self.new_book_number = eval(input("请输入新的库存："))
+
+                            # 判断新的库存和旧的库存是否相同
+                            if self.new_book_number == Person.Book_Number[self.index]:
+                                print("新的库存不可和旧的库存相同，请重新输入！")
+                                continue
+                            else:
+                                Person.Book_Number[self.index] = self.new_book_number
+                                break
+                        self.update_bookInfo()
+                        print("修改成功！")
+                        break
+
+                    else:
+                        raise valueError
+                except valueError as vErr:
+                    print(vErr)
                     continue
             self.menu2_2()
 
@@ -1125,48 +1145,71 @@ class Root(Person):
         # 标识查询到的书籍的索引
         self.index = 0
 
-        self.a = eval(input("请输入查询的模式（1：单个  2：全部）："))
-        if self.a == 1:
-            self.book_name = input("请输入要查询的书名：")
+        # 捕获输入非法字符的异常
+        try:
+            self.a = eval(input("请输入查询的模式（1：单个  2：全部）："))
+        except:
+            print(inputError.__str__(self))
+            self.show_book()
 
-            for i in Person.Book_Name:
-                if i == self.book_name:
-                    self.flag += 1
-                    self.index = Person.Book_Name.index(i)
-                    break
+        # 捕获输入选项错误的异常
+        try:
+            if self.a == 1:
+                self.book_name = input("请输入要查询的书名：")
 
-            if self.flag == 1:
+                for i in Person.Book_Name:
+                    if i == self.book_name:
+                        self.flag += 1
+                        self.index = Person.Book_Name.index(i)
+                        break
+
+                if self.flag == 1:
+                    print("查询结果如下：")
+                    print(f"书名：{self.book_name}\n库存：{Person.Book_Number[self.index]}")
+                else:
+                    print(f"'{self.book_name}'不存在！")
+                self.menu2_2()
+
+            elif self.a == 2:
                 print("查询结果如下：")
-                print(f"书名：{self.book_name}\n库存：{Person.Book_Number[self.index]}")
+                print("书名\t\t库存".center(20))
+                for i in range(0,len(Person.Book_Number)):
+                    print(f"{Person.Book_Name[i]}\t\t{Person.Book_Number[i]}".center(20))
+
+                self.menu2_2()
+
             else:
-                print(f"'{self.book_name}'不存在！")
-            self.menu2_2()
-
-        elif self.a == 2:
-            print("查询结果如下：")
-            print("书名\t\t库存".center(20))
-            for i in range(0,len(Person.Book_Number)):
-                print(f"{Person.Book_Name[i]}\t\t{Person.Book_Number[i]}".center(20))
-
-            self.menu2_2()
-
+                raise valueError
+        except valueError as vErr:
+            print(vErr)
+            self.show_book()
 
 # 判断是普通用户还是管理员
 def user_or_root():
     print("\n----请选择你的身份----")
     print("--    1.普通用户    --")
     print("--    2.管理员      --\n")
-    a = eval(input("请输入你的选择："))
-    if a == 1:
-        user = User()
-        user.menu1()
-    elif a == 2:
-        root = Root()
-        root.root_menu()
-    else:
-        print("输入有误,请重新输入")
+
+    # 捕获输入非法字符的异常
+    try:
+        a = eval(input("请输入你的选择："))
+    except:
+        print('输入有误，请重新输入！')
         user_or_root()
 
+    # 捕获输入选项错误的异常
+    try:
+        if a == 1:
+            user = User()
+            user.menu1()
+        elif a == 2:
+            root = Root()
+            root.root_menu()
+        else:
+            raise valueError
+    except valueError as vErr:
+        print(vErr)
+        user_or_root()
 
 if __name__ == "__main__":
     user_or_root()
