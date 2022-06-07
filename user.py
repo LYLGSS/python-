@@ -3,6 +3,14 @@ import maskpass
 import json
 import os
 
+class inputError(Exception):
+    def __str__(self):
+        return '输入有误，请重新输入！'
+
+class valueError(Exception):
+    def __str__(self):
+        return '没有该选项，请重新输入！'
+
 class Person:
 
     # 类属性
@@ -122,15 +130,27 @@ class User(Person):
         print("---          2.登录          ---")
         print("---          3.退出          ---")
         print("--------------------------------\n")
-        self.a = eval(input("请输入你的选择："))
-        if self.a == 1:
-            self.register()
-        elif self.a == 2:
-            self.login()
-        elif self.a == 3:
-            exit(1)
-        else:
-            print("输入有误,请重新输入")
+
+        # 捕获输入非法字符异常
+        try:
+            self.a = eval(input("请输入你的选择："))
+        except:
+            print(inputError.__str__(self))
+            self.menu1()
+
+        # 捕获输入选择项错误异常
+        try:
+            if self.a == 1:
+                self.register()
+            elif self.a == 2:
+                self.login()
+            elif self.a == 3:
+                print("退出成功！")
+                exit(1)
+            else:
+                raise valueError
+        except valueError as vErr:
+            print(vErr)
             self.menu1()
 
     # 查询书籍库中可借的书
@@ -258,12 +278,22 @@ class User(Person):
 
                     # 判断输入是否有误
                     while 1:
-                        self.change = eval(input("请输入你的选择："))
-                        if self.change == 1 or self.change == 2:
-                            break
-                        else:
-                            print("输入有误，请重新输入")
+                        # 捕获输入非法字符异常
+                        try:
+                            self.change = eval(input("请输入你的选择："))
+                        except:
+                            print(inputError.__str__(self))
                             continue
+
+                        # 捕获输入选项错误异常
+                        try:
+                            if not (self.change == 1 or self.change == 2):
+                                raise valueError
+                        except valueError as vErr:
+                            print(vErr)
+                            continue
+                        else:
+                            break
 
                     if self.change == 1:
                         self.flag_Name_flase = 0  # 重置该值为0，防止下次无法进入输入名字的循环
@@ -283,17 +313,28 @@ class User(Person):
         print("---        3.查看已借阅      ---")
         print("---        4.退出登录        ---")
         print("-------------------------------\n")
-        self.a = eval(input("请输入你的选择："))
-        if self.a == 1:
-            self.borrow_book()
-        elif self.a == 2:
-            self.repaid_book()
-        elif self.a == 3:
-            self.show_myBook()
-        elif self.a == 4:
-            exit(1)
-        else:
-            print("输入有误,请重新输入")
+
+        # 捕获输入非法字符异常
+        try:
+            self.a = eval(input("请输入你的选择："))
+        except:
+            print(inputError.__str__(self))
+            self.menu1_book()
+
+        # 捕获输入选择项错误异常
+        try:
+            if self.a == 1:
+                self.borrow_book()
+            elif self.a == 2:
+                self.repaid_book()
+            elif self.a == 3:
+                self.show_myBook()
+            elif self.a == 4:
+                exit(1)
+            else:
+                raise valueError
+        except valueError as vErr:
+            print(vErr)
             self.menu1_book()
 
     # 借阅书籍
@@ -461,14 +502,23 @@ class Root(Person):
         print("---          2.图书管理页             ---")
         print("-----------------------------------------\n")
 
-        self.s = eval(input("请输入你的选择："))
+        # 捕获输入非法字符异常
+        try:
+            self.s = eval(input("请输入你的选择："))
+        except:
+            print(inputError.__str__(self))
+            self.root_menu()
 
-        if self.s == 1:
-            self.menu2()
-        elif self.s == 2:
-            self.menu2_2()
-        else:
-            print("输入有误，请重新输入！")
+        # 捕获输入选项错误异常
+        try:
+            if self.s == 1:
+                self.menu2()
+            elif self.s == 2:
+                self.menu2_2()
+            else:
+                raise valueError
+        except valueError as vErr:
+            print(vErr)
             self.root_menu()
 
     def menu2(self):
@@ -481,20 +531,30 @@ class Root(Person):
         print("|", "5.退出系统".center(27), "|")
         print("|", "-".center(31, "-"), "|\n")
 
-        self.b = eval(input("请输入你的选择："))
+        # 捕获输入非法字符异常
+        try:
+            self.b = eval(input("请输入你的选择："))
+        except:
+            print(inputError.__str__(self))
+            self.menu2()
 
-        if self.b == 1:
-            self.add_Info()
-        elif self.b == 2:
-            self.del_Info()
-        elif self.b == 3:
-            self.change_Info()
-        elif self.b == 4:
-            self.show_Info()
-        elif self.b == 5:
-            exit(1)
-        else:
-            print("输入有误，请重新输入！")
+        # 捕获输入选项错误异常
+        try:
+            if self.b == 1:
+                self.add_Info()
+            elif self.b == 2:
+                self.del_Info()
+            elif self.b == 3:
+                self.change_Info()
+            elif self.b == 4:
+                self.show_Info()
+            elif self.b == 5:
+                print("退出成功！")
+                exit(1)
+            else:
+                raise valueError
+        except valueError as vErr:
+            print(vErr)
             self.menu2()
 
     def menu2_2(self):
@@ -507,20 +567,30 @@ class Root(Person):
         print("|", "5.退出系统".center(25), "|")
         print("|", "-".center(29, "-"), "|\n")
 
-        self.b = eval(input("请输入你的选择："))
+        # 捕获输入非法字符异常
+        try:
+            self.b = eval(input("请输入你的选择："))
+        except:
+            print(inputError.__str__(self))
+            self.menu2_2()
 
-        if self.b == 1:
-            self.add_book()
-        elif self.b == 2:
-            self.del_book()
-        elif self.b == 3:
-            self.change_book()
-        elif self.b == 4:
-            self.show_book()
-        elif self.b == 5:
-            exit(1)
-        else:
-            print("输入有误，请重新输入！")
+        # 捕获输入选项错误异常
+        try:
+            if self.b == 1:
+                self.add_book()
+            elif self.b == 2:
+                self.del_book()
+            elif self.b == 3:
+                self.change_book()
+            elif self.b == 4:
+                self.show_book()
+            elif self.b == 5:
+                print("退出成功！")
+                exit(1)
+            else:
+                raise valueError
+        except valueError as vErr:
+            print(vErr)
             self.menu2_2()
 
     def change_userDirName(self,new_name):
@@ -658,162 +728,173 @@ class Root(Person):
                     self.flag += 1
                     self.index = Person.Name.index(i)
 
-                    self.select = eval(input("请输入要修改的内容（1：用户名  2：密码  3：用户名和密码）："))
+                    while 1:
+                        # 捕获输入非法字符的异常
+                        try:
+                            self.select = eval(input("请输入要修改的内容（1：用户名  2：密码  3：用户名和密码）："))
+                        except:
+                            print(inputError.__str__(self))
+                            continue
 
-                    if self.select == 1:
+                        # 捕获输入选项错误的异常
+                        try:
+                            if self.select == 1:
 
-                        # 修改用户名
-                        while 1:
-                            # 标识新的用户名是否可用
-                            self.index1 = 0
-
-                            self.new_name = input("请输入新的用户名：")
-
-                            if self.new_name == Person.Name[self.index]:
-                                print("新的用户名和旧的用户名不可以相同，请重新输入")
-                                continue
-
-                            for i in Person.Name:
-                                if self.new_name == i:
-                                    self.index1 += 1
-                                    break
-
-                            # 新的用户名可用
-                            if self.index1 == 0:
                                 # 修改用户名
-                                Person.Name[self.index] = self.new_name
+                                while 1:
+                                    # 标识新的用户名是否可用
+                                    self.index1 = 0
+
+                                    self.new_name = input("请输入新的用户名：")
+
+                                    if self.new_name == Person.Name[self.index]:
+                                        print("新的用户名和旧的用户名不可以相同，请重新输入")
+                                        continue
+
+                                    for i in Person.Name:
+                                        if self.new_name == i:
+                                            self.index1 += 1
+                                            break
+
+                                    # 新的用户名可用
+                                    if self.index1 == 0:
+                                        # 修改用户名
+                                        Person.Name[self.index] = self.new_name
+                                        self.update_userInfo()
+                                        self.change_userDirName(self.new_name)
+                                        print("用户名修改成功！")
+                                        break
+                                    elif self.index1 == 1:
+                                        # 新用户名已存在
+                                        print("该用户名已存在，请重新输入！")
+                                        continue
+                                self.menu2()
+
+                            elif self.select == 2:
+
+                                # -------------------判断密码是否符合要求-----------------------
+                                while 1:
+                                    self.new_password = maskpass.askpass(prompt="请输入新的密码（最少6位且字母数字混合）：")
+                                    # self.new_password = input("请输入新的密码（最少6位且字母数字混合）：")
+
+                                    self.flag_in_Number_Bank = 0
+                                    self.flag_in_Letter_Bank = 0
+
+                                    # 记录密码中字母和数字的个数  flag_in_Letter_Bank(字母)  flag_in_Number_Bank(数字)
+                                    for i in self.new_password:
+                                        for j in Person.Number_Bank:
+                                            if i == j:
+                                                self.flag_in_Number_Bank += 1
+                                        for k in Person.Letter_Bank:
+                                            if i == k:
+                                                self.flag_in_Letter_Bank += 1
+
+                                    # 控制密码不少于6位
+                                    if len(self.new_password) < 6:
+                                        print("密码不可少于6位，请重新输入")
+                                        continue
+
+                                    # 控制密码应至少为字母+数字的组合
+                                    elif self.flag_in_Number_Bank == 0:
+                                        print("密码不可为纯字母，请重新输入")
+                                        continue
+                                    elif self.flag_in_Letter_Bank == 0:
+                                        print("密码不可为纯数字，请重新输入")
+                                        continue
+                                    elif self.new_password == Person.Password[self.index]:
+                                        print("新密码和旧密码不可以相同，请重新输入")
+                                        continue
+
+                                    # 密码符合要求，修改密码
+                                    else:
+                                        Person.Password[self.index] = self.new_password
+                                        self.update_userInfo()
+                                        print("密码修改成功！\n")
+                                        break
+
+                                # ---------------------------------------
+                                self.menu2()
+
+                            elif self.select == 3:
+
+                                # 修改用户名
+                                while 1:
+                                    # 标识新的用户名是否可用
+                                    self.index1 = 0
+
+                                    self.new_name = input("请输入新的用户名：")
+
+                                    if self.new_name == Person.Name[self.index]:
+                                        print("新的用户名和旧的用户名不可以相同，请重新输入")
+                                        continue
+
+                                    for i in Person.Name:
+                                        if self.new_name == i:
+                                            self.index1 += 1
+                                            break
+
+                                    # 新的用户名可用
+                                    if self.index1 == 0:
+                                        # 修改用户名
+                                        Person.Name[self.index] = self.new_name
+                                        break
+                                    elif self.index1 == 1:
+                                        # 新用户名已存在
+                                        print("该用户名已存在，请重新输入！")
+                                        continue
+
+                                # -------------------判断密码是否符合要求-----------------------
+                                while 1:
+                                    self.new_password = maskpass.askpass(prompt="请输入新的密码（最少6位且字母数字混合）：")
+                                    # self.new_password = input("请输入新的密码（最少6位且字母数字混合）：")
+
+                                    self.flag_in_Number_Bank = 0
+                                    self.flag_in_Letter_Bank = 0
+
+                                    # 记录密码中字母和数字的个数  flag_in_Letter_Bank(字母)  flag_in_Number_Bank(数字)
+                                    for i in self.new_password:
+                                        for j in Person.Number_Bank:
+                                            if i == j:
+                                                self.flag_in_Number_Bank += 1
+                                        for k in Person.Letter_Bank:
+                                            if i == k:
+                                                self.flag_in_Letter_Bank += 1
+
+                                    # 控制密码不少于6位
+                                    if len(self.new_password) < 6:
+                                        print("密码不可少于6位，请重新输入")
+                                        continue
+
+                                    # 控制密码应至少为字母+数字的组合
+                                    elif self.flag_in_Number_Bank == 0:
+                                        print("密码不可为纯字母，请重新输入")
+                                        continue
+                                    elif self.flag_in_Letter_Bank == 0:
+                                        print("密码不可为纯数字，请重新输入")
+                                        continue
+                                    elif self.new_password == Person.Password[self.index]:
+                                        print("新密码和旧密码不可以相同，请重新输入")
+                                        continue
+
+                                    # 密码符合要求，修改密码
+                                    else:
+                                        Person.Password[self.index] = self.new_password
+                                        break
+
+                                # ---------------------------------------
                                 self.update_userInfo()
                                 self.change_userDirName(self.new_name)
-                                print("用户名修改成功！")
-                                break
-                            elif self.index1 == 1:
-                                # 新用户名已存在
-                                print("该用户名已存在，请重新输入！")
-                                continue
-                        self.menu2()
+                                print("用户名和密码修改成功！")
 
-                    elif self.select == 2:
+                                self.menu2()
 
-                        # -------------------判断密码是否符合要求-----------------------
-                        while 1:
-                            self.new_password = maskpass.askpass(prompt="请输入新的密码（最少6位且字母数字混合）：")
-                            # self.new_password = input("请输入新的密码（最少6位且字母数字混合）：")
-
-                            self.flag_in_Number_Bank = 0
-                            self.flag_in_Letter_Bank = 0
-
-                            # 记录密码中字母和数字的个数  flag_in_Letter_Bank(字母)  flag_in_Number_Bank(数字)
-                            for i in self.new_password:
-                                for j in Person.Number_Bank:
-                                    if i == j:
-                                        self.flag_in_Number_Bank += 1
-                                for k in Person.Letter_Bank:
-                                    if i == k:
-                                        self.flag_in_Letter_Bank += 1
-
-                            # 控制密码不少于6位
-                            if len(self.new_password) < 6:
-                                print("密码不可少于6位，请重新输入")
-                                continue
-
-                            # 控制密码应至少为字母+数字的组合
-                            elif self.flag_in_Number_Bank == 0:
-                                print("密码不可为纯字母，请重新输入")
-                                continue
-                            elif self.flag_in_Letter_Bank == 0:
-                                print("密码不可为纯数字，请重新输入")
-                                continue
-                            elif self.new_password == Person.Password[self.index]:
-                                print("新密码和旧密码不可以相同，请重新输入")
-                                continue
-
-                            # 密码符合要求，修改密码
                             else:
-                                Person.Password[self.index] = self.new_password
-                                self.update_userInfo()
-                                print("密码修改成功！\n")
-                                break
-
-                        # ---------------------------------------
-                        self.menu2()
-
-                    elif self.select == 3:
-
-                        # 修改用户名
-                        while 1:
-                            # 标识新的用户名是否可用
-                            self.index1 = 0
-
-                            self.new_name = input("请输入新的用户名：")
-
-                            if self.new_name == Person.Name[self.index]:
-                                print("新的用户名和旧的用户名不可以相同，请重新输入")
-                                continue
-
-                            for i in Person.Name:
-                                if self.new_name == i:
-                                    self.index1 += 1
-                                    break
-
-                            # 新的用户名可用
-                            if self.index1 == 0:
-                                # 修改用户名
-                                Person.Name[self.index] = self.new_name
-                                break
-                            elif self.index1 == 1:
-                                # 新用户名已存在
-                                print("该用户名已存在，请重新输入！")
-                                continue
-
-                        # -------------------判断密码是否符合要求-----------------------
-                        while 1:
-                            self.new_password = maskpass.askpass(prompt="请输入新的密码（最少6位且字母数字混合）：")
-                            # self.new_password = input("请输入新的密码（最少6位且字母数字混合）：")
-
-                            self.flag_in_Number_Bank = 0
-                            self.flag_in_Letter_Bank = 0
-
-                            # 记录密码中字母和数字的个数  flag_in_Letter_Bank(字母)  flag_in_Number_Bank(数字)
-                            for i in self.new_password:
-                                for j in Person.Number_Bank:
-                                    if i == j:
-                                        self.flag_in_Number_Bank += 1
-                                for k in Person.Letter_Bank:
-                                    if i == k:
-                                        self.flag_in_Letter_Bank += 1
-
-                            # 控制密码不少于6位
-                            if len(self.new_password) < 6:
-                                print("密码不可少于6位，请重新输入")
-                                continue
-
-                            # 控制密码应至少为字母+数字的组合
-                            elif self.flag_in_Number_Bank == 0:
-                                print("密码不可为纯字母，请重新输入")
-                                continue
-                            elif self.flag_in_Letter_Bank == 0:
-                                print("密码不可为纯数字，请重新输入")
-                                continue
-                            elif self.new_password == Person.Password[self.index]:
-                                print("新密码和旧密码不可以相同，请重新输入")
-                                continue
-
-                            # 密码符合要求，修改密码
-                            else:
-                                Person.Password[self.index] = self.new_password
-                                break
-
-                        # ---------------------------------------
-                        self.update_userInfo()
-                        self.change_userDirName(self.new_name)
-                        print("用户名和密码修改成功！")
-
-                        self.menu2()
-
-                    else:
-                        print("输入有误，请重新输入！")
-                        continue
-
+                                raise valueError
+                        except valueError as vErr:
+                            print(vErr)
+                            continue
+                        else:
+                            break
             if self.flag == 0:
                 print("该用户不存在，请重新输入！")
                 self.change_Info()
@@ -1068,6 +1149,7 @@ class Root(Person):
                 print(f"{Person.Book_Name[i]}\t\t{Person.Book_Number[i]}".center(20))
 
             self.menu2_2()
+
 
 # 判断是普通用户还是管理员
 def user_or_root():
