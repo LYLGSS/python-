@@ -227,8 +227,8 @@ class User(Person):
                     self.update_userInfo()
 
                     print("注册成功！\n")
-                    print("Name:", Person.Name)
-                    print("Password:", Person.Password)
+                    # print("Name:", Person.Name)
+                    # print("Password:", Person.Password)
                     break
             self.menu1()
 
@@ -593,6 +593,7 @@ class Root(Person):
             print(vErr)
             self.menu2_2()
 
+    # 更改用户文件夹名字
     def change_userDirName(self,new_name):
         old_dirName = self.get_myDir()
         new_dirName = os.path.join(os.path.join(os.getcwd(),"data\\user"),new_name)
@@ -677,7 +678,7 @@ class Root(Person):
             print("该用户不存在，请重新输入！")
             self.del_Info()
         else:
-            # 删除用户之前判断该该用户是否借阅书籍，若借阅的有书，则无法删除
+            # 删除用户之前判断该用户是否借阅书籍，若借阅的有书，则无法删除
             temp_my_book = self.read_my_book()
             if len(temp_my_book) == 0:
                 # 没有未归还的书
